@@ -1,0 +1,112 @@
+---
+title: "datacleaning"
+author: "sormeh"
+date: "2/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message = FALSE, echo = FALSE}
+#Suppressing warnings about libraries
+#Import  libraries (currently overdoing it)
+library(tidyverse)    
+library(ggplot2)      # graphics library
+library(gridExtra)    # For displaying graphs side-by-side
+library(knitr)        # contains knitting control
+library(tree)         # For the tree-fitting 'tree' function
+library(randomForest) # For random forests
+library(rpart)        # For nicer tree fitting
+library(partykit)     # For nicer tree plotting
+library(boot)         # For cv.glm
+library(leaps)        # needed for regsubsets (though maybe not relevant b/c our outcome vars are binary)
+library(plotly)
+library(rsample)      # data splitting, just trying to see if works (for naive bayes)
+library(dplyr)        # data transformation, just trying to see if works (naive bayes)
+library(binom)
+options(scipen = 4)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+## Loaded csv file for work, named the dataframe expenditure.small
+top.employers <- read.csv("Top_Employers_Full_Data.csv", header=T)
+grow.occupation <- read.csv("Growing_Occupations_Full_Data.csv", header=T)
+grow.industry <- read.csv("Growing_Industries_Full_Data.csv", header=T)
+```
+
+
+```{r}
+## Get column names in order to change them to be more specific
+colnames(top.employers)
+colnames(top.employers) <- c("WDA",
+                        "Employer",
+                        "Emp.Measure",
+                        "Workforce.Development.Area",
+                        "Emp.Industry.Title",
+                        "Emp.Jan.20",
+                        "Emp.Jan.21",
+                        "Emp.Volume.Change")
+colnames(top.employers)
+top.emp <- select(top.employers, WDA, Employer, Emp.Jan.20, Emp.Jan.21, Emp.Volume.Change)
+
+## Growing Occupations DataSet
+colnames(grow.occupation)
+colnames(grow.occupation) <- c("WDA",
+                        "Occupation",
+                        "Occ.Measure",
+                        "Workforce.Development.Area",
+                        "Occupation.Title",
+                        "Occ.Jan.20",
+                        "Occ.Jan.21",
+                        "Occ.Volume.Change")
+
+colnames(grow.occupation)
+grow.occ <- select(grow.occupation, WDA, Occupation, Occ.Jan.20, Occ.Jan.21, Occ.Volume.Change)
+
+## Growing Industry DataSet
+colnames(grow.industry)
+colnames(grow.industry) <- c("WDA",
+                        "Industry",
+                        "Ind.Measure",
+                        "Workforce.Development.Area",
+                        "Industry.Title",
+                        "Ind.Jan.20",
+                        "Ind.Jan.21",
+                        "Ind.Volume.Change")
+
+colnames(grow.industry)
+grow.ind <- select(grow.industry, WDA, Industry, Ind.Jan.20, Ind.Jan.21, Ind.Volume.Change)
+
+```
+## Merge data sets:
+```{r}
+# join by the column "type"
+empind_merged = inner_join(x=top.emp, y=grow.ind, by='WDA')
+empoccind_merged = inner_join(x=empind_merged, y=grow.occ, by='WDA')
+```
+
+```{r}
+## just for now I'm going to load the top.employers dataset and see if I can make an app with it
+save(top.employers, file = "topemployers.Rdata")
+save(empoccind_merged, file="labor.Rdata")
+write.csv(empoccind_merged, "labor.csv", row.names= FALSE)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+
+unique(top.employers$WDA)
+```
+
+
+
