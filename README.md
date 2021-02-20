@@ -11,4 +11,6 @@ loading any data besides the very first one I loaded.
 
 Besides that, I believe everything else required in the homework should be there. 
 
+Please ignore the folder called `app2`. It is not part of the homework submission.
+
 Thank you.
