@@ -34,6 +34,8 @@ ui <- fluidPage(
         # Inputs: Select variables to plot ------------------------------
         sidebarPanel(
                
+            downloadButton("download1", "Download Employer Data"),
+            br(), br(),
             # Select variable for y-axis ----------------------------------
             selectInput(inputId = "y", 
                         label = "Y-axis:",
@@ -186,26 +188,30 @@ server <- function(input, output, session) {
     })
     
     
-    #packing <- circleProgressiveLayout(top.employers$Emp.Volume.Change, sizetype='area')
+    ## This plot ended up being illegible, so I opted for the lollipop
     
-    #data <- cbind(top.employers, packing)
-    
-    #dat.gg <- circleLayoutVertices(packing, npoints=50)
-    
-    #output$circleplot <- renderPlot({ggplot() + 
+    output$circleplot <- renderPlot({
+        
+        packing <- circleProgressiveLayout(top.employers$Emp.Volume.Change, sizetype='area')
+        
+        data <- cbind(top.employers, packing)
+        
+        dat.gg <- circleLayoutVertices(packing, npoints=10)
+        
+        ggplot() + 
         
         # Make the bubbles
-     #   geom_polygon(data = dat.gg, aes(input$x, input$y, group = input$x, fill=as.factor(input$y)), colour = "black", alpha = 0.6) +
+        geom_polygon(data = dat.gg, aes(input$x, input$y, fill=as.factor(input$y)), colour = "black", alpha = 0.6) +
         
         # Add text in the center of each bubble + control its size
-      #  geom_text(data = data, aes(x, y, size=value, label = group)) +
-      #  scale_size_continuous(range = c(1,4)) +
+        geom_text(data = data, aes(x, y, size=top.employers$Emp.Volume.Change, label=input$y)) +
+        scale_size_continuous(range = c(1,4)) +
         
         # General theme:
-      #  theme_void() + 
-      #  theme(legend.position="none") +
-      #  coord_equal()
-    #})
+        theme_void() + 
+        theme(legend.position="none") +
+        coord_equal()
+    })
     
     #output$circleplot <- renderPlot({
     #    ggplot(data = top_sample(), aes_string(x = input$x, y = input$y,
@@ -233,6 +239,16 @@ server <- function(input, output, session) {
             DT::datatable(data = top_sample()[1:10,], 
                           options = list(pageLength = 10), 
                           rownames = FALSE)
+        }
+    )
+    
+    output$downloadTest <- downloadHandler(
+        filename <- function(){
+            paste("topemployers.RData")
+        },
+        
+        content = function(file) {
+            save(top.employers, file = file)
         }
     )
 }
