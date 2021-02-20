@@ -1,0 +1,13 @@
+name: hw1_sormehy
+title: hw1_sormehy
+username:
+account: sormehy
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3670080
+bundleId: 4249106
+url: https://sormehy.shinyapps.io/hw1_sormehy/
+when: 1613840496.60967
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: bobfile.Rmd|labor.csv
