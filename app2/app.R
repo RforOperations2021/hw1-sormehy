@@ -5,7 +5,10 @@ library(stringr)
 library(dplyr)
 library(tools)
 #load("labor.Rdata")
-labor <- read.csv("labor.csv", header=T)
+#labor <- read.csv("labor.csv", header=T)
+labor <- read.csv(file = "labor.csv")
+
+labor <- as.data.frame(labor)
 # Define UI for application that plots features of employer -----------
 ui <- fluidPage(
     

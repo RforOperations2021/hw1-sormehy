@@ -4,9 +4,18 @@ library(DT)
 library(stringr)
 library(dplyr)
 library(tools)
+library(packcircles)
+library(plotly)
+library(viridis)
+library(hrbrthemes)
+
+## Loading Data - see cleaning_data.Rmd for how data was created
+
 load("topemployers.Rdata")
 #load("labor.Rdata")
+#labor <- read.csv(file = "labor.csv")
 
+#labor <- as.data.frame(labor)
 
 # Define UI for application that plots features of employer -----------
 ui <- fluidPage(
@@ -24,7 +33,7 @@ ui <- fluidPage(
         
         # Inputs: Select variables to plot ------------------------------
         sidebarPanel(
-            
+               
             # Select variable for y-axis ----------------------------------
             selectInput(inputId = "y", 
                         label = "Y-axis:",
@@ -38,7 +47,7 @@ ui <- fluidPage(
                         label = "X-axis:",
                         choices = c("Measure" = "Emp.Measure", 
                                     "Industry" = "Emp.Industry.Title"), 
-                        selected = "Emp.Measure"),
+                        selected = "Emp.Industry.Title"),
             
             # Select variable for color -----------------------------------
             selectInput(inputId = "z", 
@@ -72,6 +81,8 @@ ui <- fluidPage(
             # Horizontal line for visual separation -----------------------
             hr(),
             
+            
+            
             # Select which types of employer to plot ------------------------
             checkboxGroupInput(inputId = "selected_type",
                                label = "Select County/Counties:",
@@ -86,9 +97,7 @@ ui <- fluidPage(
             numericInput(inputId = "n_samp", 
                          label = "Sample size:", 
                          min = 1, max = nrow(top.employers), 
-                         value = 50)
-            
-        ),
+                         value = 50)),
         
         # Output: -------------------------------------------------------
         mainPanel(
@@ -98,8 +107,8 @@ ui <- fluidPage(
                          uiOutput(outputId = "n"),
                          br(), br(),
                          DT::dataTableOutput(outputId = "employertable")),
-                tabPanel("Industry", plotOutput(outputId = "scatterplot")),
-                tabPanel("Occupation", plotOutput(outputId = "scatterplot"))
+                tabPanel("Industry", plotOutput(outputId = "barplot")),
+                tabPanel("Occupation", plotOutput(outputId = "lollipop"))
             )
             # Show scatterplot --------------------------------------------
             #plotOutput(outputId = "scatterplot"),
@@ -151,9 +160,63 @@ server <- function(input, output, session) {
             labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
                  y = toTitleCase(str_replace_all(input$y, "_", " ")),
                  color = toTitleCase(str_replace_all(input$z, "_", " ")),
-                 title = pretty_plot_title()
-            )
+                 title = pretty_plot_title()) + 
+            theme(axis.text.x = element_text(angle = 90, hjust = 1))
     })
+    
+    output$barplot <- renderPlot({
+        ggplot(data = top_sample(), aes_string(x = input$x, y = input$y,
+                                               color = input$z)) +
+            geom_bar(stat='identity', position='stack') +
+            labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+                 y = toTitleCase(str_replace_all(input$y, "_", " ")),
+                 color = toTitleCase(str_replace_all(input$z, "_", " ")),
+                 title = pretty_plot_title()) + 
+            theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    })
+    
+    output$lollipop <- renderPlot({ ggplot(top.employers) +
+        geom_segment( aes(x=Emp.Jan.20, xend=Emp.Jan.20, y=Emp.Jan.21, yend=Emp.Jan.21), color="grey") +
+        geom_point( aes(x=Emp.Jan.20, y=Emp.Jan.21), color=rgb(0.2,0.7,0.1,0.5), size=3 ) +
+        geom_point( aes(x=Emp.Jan.20, y=Emp.Jan.21), color=rgb(0.7,0.2,0.1,0.5), size=3 ) +
+        coord_flip()+
+        theme_ipsum() +
+        xlab("") +
+        ylab("Value of Employer")
+    })
+    
+    
+    #packing <- circleProgressiveLayout(top.employers$Emp.Volume.Change, sizetype='area')
+    
+    #data <- cbind(top.employers, packing)
+    
+    #dat.gg <- circleLayoutVertices(packing, npoints=50)
+    
+    #output$circleplot <- renderPlot({ggplot() + 
+        
+        # Make the bubbles
+     #   geom_polygon(data = dat.gg, aes(input$x, input$y, group = input$x, fill=as.factor(input$y)), colour = "black", alpha = 0.6) +
+        
+        # Add text in the center of each bubble + control its size
+      #  geom_text(data = data, aes(x, y, size=value, label = group)) +
+      #  scale_size_continuous(range = c(1,4)) +
+        
+        # General theme:
+      #  theme_void() + 
+      #  theme(legend.position="none") +
+      #  coord_equal()
+    #})
+    
+    #output$circleplot <- renderPlot({
+    #    ggplot(data = top_sample(), aes_string(x = input$x, y = input$y,
+    #                                           color = input$z)) +
+    #        geom_bar(stat='identity', position='stack') +
+    #        labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+    #             y = toTitleCase(str_replace_all(input$y, "_", " ")),
+    #             color = toTitleCase(str_replace_all(input$z, "_", " ")),
+    #             title = pretty_plot_title()
+    #        ) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    #})
     
     # Print number of employment plotted ----------------------------------
     output$n <- renderUI({
