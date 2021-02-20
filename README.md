@@ -1,5 +1,8 @@
 # hw1-sormehy
 Sormeh's homework 1 repository - first shiny app
+
+Published: https://sormehy.shinyapps.io/hw1_sormehy/
+
 Please only look at this app if you are teaching R Shiny at Heinz College and are named Geoffrey Arnold. 
 The data used in this app comes from Pennsylvania's Center for Workforce Information and Analysis: 
 https://www.workstats.dli.pa.gov/dashboards/Pages/Online-Job-Postings-by-WDA.aspx
