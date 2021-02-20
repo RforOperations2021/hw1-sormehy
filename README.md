@@ -13,4 +13,6 @@ Besides that, I believe everything else required in the homework should be there
 
 Please ignore the folder called `app2`. It is not part of the homework submission.
 
+The app code itself lives in the `hw1` folder.
+
 Thank you.
